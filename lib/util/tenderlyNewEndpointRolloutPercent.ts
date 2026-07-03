@@ -35,4 +35,8 @@ export const TENDERLY_NEW_ENDPOINT_ROLLOUT_PERCENT: { [chain in ChainId]: number
   [ChainId.XLAYER]: 100,
   [ChainId.LINEA]: 100,
   [ChainId.TEMPO]: 100,
+  // --- HookSwap chains ---
+  // No Tenderly project configured for these yet; keep at 0 (uses eth_estimateGas fallback).
+  [ChainId.HYPEREVM]: 0, // 999  TODO: revisit if a Tenderly node is added
+  [ChainId.ROBINHOOD]: 0, // 4663 TODO: revisit if a Tenderly node is added
 }

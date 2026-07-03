@@ -57,4 +57,7 @@ export const DEFAULT_BLOCKS_TO_LIVE_ROUTES_DB: { [chain in ChainId]: number } = 
   [ChainId.XLAYER]: 60,
   [ChainId.LINEA]: 60,
   [ChainId.TEMPO]: 60,
+  // --- HookSwap chains --- TODO: tune to actual block time; HyperEVM has sub-second small blocks
+  [ChainId.HYPEREVM]: 60,
+  [ChainId.ROBINHOOD]: 60,
 }

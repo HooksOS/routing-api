@@ -1195,6 +1195,9 @@ export const NEW_QUOTER_DEPLOY_BLOCK: { [chainId in ChainId]: number } = {
   [ChainId.XLAYER]: -1,
   [ChainId.LINEA]: -1,
   [ChainId.TEMPO]: -1,
+  // --- HookSwap chains --- TODO: set to the QuoterV2 deploy block from contracts/deployments/<chain>.json
+  [ChainId.HYPEREVM]: 0,
+  [ChainId.ROBINHOOD]: 0,
 }
 
 // 0 threshold means it's not deployed yet
@@ -1233,6 +1236,9 @@ export const LIKELY_OUT_OF_GAS_THRESHOLD: { [chainId in ChainId]: number } = {
   [ChainId.XLAYER]: 0,
   [ChainId.LINEA]: 0,
   [ChainId.TEMPO]: 0,
+  // --- HookSwap chains --- 0 = disabled/not-yet-tuned (comment above: 0 means not deployed yet)
+  [ChainId.HYPEREVM]: 0,
+  [ChainId.ROBINHOOD]: 0,
 }
 
 // TODO: Move this new addresses to SOR

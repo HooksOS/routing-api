@@ -39,4 +39,7 @@ export const NEW_CACHED_ROUTES_ROLLOUT_PERCENT: { [chain in ChainId]: number } =
   [ChainId.XLAYER]: 100,
   [ChainId.LINEA]: 100,
   [ChainId.TEMPO]: 100,
+  // --- HookSwap chains (low traffic, route directly / no cached-route DB dependency) ---
+  [ChainId.HYPEREVM]: 100, // 999
+  [ChainId.ROBINHOOD]: 100, // 4663
 }

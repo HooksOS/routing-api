@@ -115,6 +115,11 @@ export const SUPPORTED_CHAINS: ChainId[] = [
   ChainId.UNICHAIN,
   ChainId.SONEIUM,
   ChainId.XLAYER,
+  // --- HookSwap chains (v2+v3 only, NO v4) ---
+  // Requires @uniswap/sdk-core resolved to the HooksOS/sdks fork so these enum members exist.
+  ChainId.HYPEREVM, // 999  - HyperEVM
+  ChainId.ROBINHOOD, // 4663 - Robinhood
+  // ChainId.SEPOLIA (11155111) is already listed above and reused by HookSwap.
 ]
 const DEFAULT_TOKEN_LIST = 'https://gateway.ipfs.io/ipns/tokens.uniswap.org'
 
@@ -532,6 +537,10 @@ export abstract class InjectorSOR<Router, QueryParams> extends Injector<
             ChainId.SONEIUM,
             ChainId.XLAYER,
             ChainId.LINEA,
+            // --- HookSwap chains: enable V2 routing ---
+            ChainId.SEPOLIA, // HookSwap testnet target (previously V4-only upstream)
+            ChainId.HYPEREVM, // 999
+            ChainId.ROBINHOOD, // 4663
           ]
 
           const v4Supported = [
