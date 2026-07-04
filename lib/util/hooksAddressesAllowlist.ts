@@ -395,4 +395,6 @@ export const HOOKS_ADDRESSES_ALLOWLIST: { [chain in ChainId]: Array<string> } = 
   // --- HookSwap chains: v2+v3 only (ADDRESS_ZERO = no-hook pools only) ---
   [ChainId.HYPEREVM]: [ADDRESS_ZERO],
   [ChainId.ROBINHOOD]: [ADDRESS_ZERO],
+  [ChainId.MEGAETH]: [ADDRESS_ZERO],
+  [ChainId.INK]: [ADDRESS_ZERO],
 }

@@ -39,4 +39,6 @@ export const TENDERLY_NEW_ENDPOINT_ROLLOUT_PERCENT: { [chain in ChainId]: number
   // No Tenderly project configured for these yet; keep at 0 (uses eth_estimateGas fallback).
   [ChainId.HYPEREVM]: 0, // 999  TODO: revisit if a Tenderly node is added
   [ChainId.ROBINHOOD]: 0, // 4663 TODO: revisit if a Tenderly node is added
+  [ChainId.MEGAETH]: 0, // 4326 TODO: revisit if a Tenderly node is added
+  [ChainId.INK]: 0, // 57073 TODO: revisit if a Tenderly node is added
 }

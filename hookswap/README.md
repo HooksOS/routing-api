@@ -1,13 +1,15 @@
 # HookSwap self-hosted quoting service (routing-api fork)
 
 This folder documents how the forked **`HooksOS/routing-api`** (Uniswap's classic
-smart-order-router-based quoting engine) is wired for the three HookSwap chains:
+smart-order-router-based quoting engine) is wired for the HookSwap chains:
 
-| Chain     | chainId    | Protocols wired |
-|-----------|------------|-----------------|
-| Sepolia   | `11155111` | v2 + v3         |
-| HyperEVM  | `999`      | v2 + v3         |
-| Robinhood | `4663`     | v2 + v3         |
+| Chain     | chainId    | Protocols wired | Contracts |
+|-----------|------------|-----------------|-----------|
+| Sepolia   | `11155111` | v2 + v3         | canonical Uniswap stack (reused) |
+| HyperEVM  | `999`      | v2 + v3         | pending deploy (big blocks) |
+| Robinhood | `4663`     | v2 + v3         | **DEPLOYED** (own v2+v3+UR) |
+| MegaETH   | `4326`     | v2 + v3         | **DEPLOYED** (own v2+v3+UR) |
+| Ink       | `57073`    | v2 + v3         | **DEPLOYED** (own v2+v3+UR) |
 
 **No v4.** These chains are deliberately kept out of every `v4Supported` / `mixedSupported`
 gate. Quoting is V2 + V3 only.
@@ -71,7 +73,9 @@ Required env vars:
 |-----------|----------------------|------------------------------------|
 | Sepolia   | `WEB3_RPC_11155111`  | your Sepolia RPC                   |
 | HyperEVM  | `WEB3_RPC_999`       | `https://rpc.hyperliquid.xyz/evm`  |
-| Robinhood | `WEB3_RPC_4663`      | Robinhood chain RPC                |
+| Robinhood | `WEB3_RPC_4663`      | `https://rpc.mainnet.chain.robinhood.com` |
+| MegaETH   | `WEB3_RPC_4326`      | `https://mainnet.megaeth.com/rpc`  |
+| Ink       | `WEB3_RPC_57073`     | `https://rpc-gel.inkonchain.com`   |
 
 > Note: the Foundry deploy kit in `HookSwap/contracts/config/chains.json` names its RPC
 > env vars `SEPOLIA_RPC_URL` / `HYPEREVM_RPC_URL` / `ROBINHOOD_RPC_URL`. `routing-api` uses
@@ -175,15 +179,19 @@ Sources of the real values:
 - **Sepolia (11155111):** canonical Uniswap v2/v3/UniversalRouter stack is already deployed
   and already wired into `sdk-core` with real addresses (`HookSwap/contracts/config/chains.json`
   → `skipDeploy: true`). Nothing to fill.
-- **HyperEVM (999) & Robinhood (4663):** addresses are **placeholders** in the sdks fork until
-  the Foundry kit deploys the contracts. After deploy, `HookSwap/contracts/scripts` writes
-  `HookSwap/contracts/deployments/<chain>.json` (currently empty — not deployed yet). Copy
-  those addresses into the **`HooksOS/sdks` fork** (sdk-core address maps) and the
-  **`HooksOS/smart-order-router` fork** (`addresses.ts` / `chains.ts`), then rebuild the forks
-  so this `routing-api` picks them up via the §3 override.
+- **Robinhood (4663), MegaETH (4326), Ink (57073): DEPLOYED.** The Foundry kit deployed
+  HookSwap's own v2+v3+UR stack (identical, deterministic addresses on all three — see
+  `chains.md` address table and `HookSwap/contracts/deployments/{robinhood,megaeth,ink}.json`).
+  The real addresses are already wired into the **`HooksOS/sdks` fork**
+  (sdk-core `CHAIN_TO_ADDRESSES_MAP`, `39d0310e`+) and the
+  **`HooksOS/smart-order-router` fork** (`addresses.ts` / `chains.ts` + USD gas tokens,
+  `ee33769`), so this `routing-api` picks them up via the §3 override. Nothing to fill.
+- **HyperEVM (999):** addresses are still **placeholders** in the sdks fork — contracts not
+  yet deployed (needs HyperCore big blocks enabled first). After deploy, copy the addresses
+  from `HookSwap/contracts/deployments/hyperevm.json` into both forks and rebuild.
 
 WHYPE (HyperEVM wrapped native) = `0x5555555555555555555555555555555555555555`; Permit2 is the
-canonical `0x000000000022D473030F116dDEE9F6B43aC78BA3` on all three chains (per
+canonical `0x000000000022D473030F116dDEE9F6B43aC78BA3` on all chains (per
 `contracts/config/chains.json`).
 
 ---
@@ -226,19 +234,26 @@ There is **no** interface setting that makes it call `routing-api`'s classic sch
 
 ## 7. What remains before it can actually quote
 
-1. **Deploy contracts** on HyperEVM (999) and Robinhood (4663) via the Foundry kit; capture
-   `contracts/deployments/<chain>.json`.
-2. **Fill addresses** into the `HooksOS/sdks` and `HooksOS/smart-order-router` forks
-   (factory / quoter / router / multicall / wrapped-native) and rebuild them.
-3. **Add the 3 chains to the SOR fork** `src/util/chains.ts` (`SUPPORTED_CHAINS`,
-   `V2_SUPPORTED`, `ID_TO_CHAIN_ID`, `ID_TO_NETWORK_NAME`, `WRAPPED_NATIVE_CURRENCY` — the last
-   is itself an exhaustive `{ [chain in ChainId]: Token }` map) and `src/util/addresses.ts`.
-   *(This routing-api fork is wired; SOR is a separate dependency that also needs these edits —
-   see §3.)*
-4. **Apply the dependency override** (§3) so `routing-api` resolves both packages to the forks;
-   then `npm run build` compiles.
-5. **Provide liquidity** — real V2/V3 pools must exist on-chain for the static providers to
-   find routes (or deploy subgraphs and register them in `cache-config.ts`).
-6. **Set `WEB3_RPC_*`** env vars and deploy/serve routing-api.
-7. **Stand up a Trading API layer** (§6) and point the interface's `TRADING_API_URL_OVERRIDE`
+Done already:
+
+- ~~Deploy contracts~~ — **DEPLOYED** on Robinhood (4663), MegaETH (4326), Ink (57073)
+  (own v2+v3+UR stack; `HookSwap/contracts/deployments/{robinhood,megaeth,ink}.json`).
+  HyperEVM (999) remains pending (big blocks).
+- ~~Fill addresses into the forks~~ — real addresses wired into `HooksOS/sdks` sdk-core
+  `CHAIN_TO_ADDRESSES_MAP` (`39d0310e`+) and `HooksOS/smart-order-router` chains/addresses/USD
+  gas tokens (`ee33769`).
+- ~~Wire chains in this routing-api fork~~ — Sepolia/HyperEVM/Robinhood/MegaETH/Ink gated in
+  `SUPPORTED_CHAINS` + `v2Supported` and all exhaustive ChainId maps.
+
+Remaining:
+
+1. **Apply the dependency override** (§3) so `routing-api` resolves `@uniswap/sdk-core` and
+   `@uniswap/smart-order-router` to the HooksOS forks; then `npm run build` compiles.
+2. **Set `WEB3_RPC_*`** env vars (`11155111`, `999`, `4663`, `4326`, `57073` — see
+   `.env.example`) and deploy/serve routing-api.
+3. **Provide liquidity** — real V2/V3 pools must exist on-chain for the static providers to
+   find routes (or deploy subgraphs and register them in `cache-config.ts`). This is the real
+   launch blocker: empty pools quote nothing.
+4. **Stand up a Trading API layer** (§6) and point the interface's `TRADING_API_URL_OVERRIDE`
    at it.
+5. *(HyperEVM only)* deploy the stack on 999, then fill its addresses into the forks.

@@ -57,4 +57,6 @@ export const EXTRA_V4_FEE_TICK_SPACINGS_HOOK_ADDRESSES: { [chain in ChainId]: Ar
   // --- HookSwap chains: v2+v3 only, no v4 hook routing ---
   [ChainId.HYPEREVM]: emptyV4FeeTickSpacingsHookAddresses,
   [ChainId.ROBINHOOD]: emptyV4FeeTickSpacingsHookAddresses,
+  [ChainId.MEGAETH]: emptyV4FeeTickSpacingsHookAddresses,
+  [ChainId.INK]: emptyV4FeeTickSpacingsHookAddresses,
 }
